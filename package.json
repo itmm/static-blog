@@ -1,0 +1,15 @@
+{
+  "name": "static-blog",
+  "version": "0.0.1",
+  "description": "Generator of static blog-like Homepages",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Timm Knape",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^6.1.3"
+  }
+}
