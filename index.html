@@ -7,13 +7,12 @@
 	<head>
 	<body>
 		<ul id="pages">
-			<li class="active"><a href="">Blog 1</a></li>
-			<li><a href="">Blog 2</a></li>
 		</ul>
 		<div id="edit">
-			<textarea></textarea>
+			<textarea id="edit-area"></textarea>
 			<div id="edit-buttons">
 				<button id="do-delete">Seite löschen</button>
+				<button id="do-undo">Änderungen zurücknehmen</button>
 				<button id="do-preview">Vorschau</button>
 			</div>
 		</div>
@@ -21,6 +20,7 @@
 			<div id="content"></div>
 			<button id="do-edit">Editieren</button>
 		</div>
+		<script src="markdown-it.min.js"></script>
 		<script src="static-blog.js"></script>
 	</body>
 </html>
