@@ -1,0 +1,43 @@
+body, html, #pages {
+	margin: 0;
+	padding: 0;
+}
+html, body {
+	height: 100%;
+}
+.hidden {
+	display: none !Important;
+}
+.active {
+	background-color: #aaf;
+}
+body {
+	display: flex;
+}
+#pages {
+	list-style-type: none;
+}
+#pages li {
+	padding: 4px 8px;
+}
+#pages li a, #pages li a:visited {
+	color: #000;
+	text-decoration: none;
+}
+#edit, #preview {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+#edit textarea, #content {
+		flex-grow: 1;
+}
+#edit-buttons {
+	display: flex;
+}
+#edit-buttons button {
+	flex-grow: 1;
+}
+button {
+	margin: 4px 8px;
+}

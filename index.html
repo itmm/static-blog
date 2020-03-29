@@ -1,9 +1,26 @@
 <!doctype html>
-<html>
+<html lang="de">
 	<head>
-		<title>First Try</title>
+		<meta charset="utf-8">
+		<title>Static Blog</title>
+		<link rel="stylesheet" href="style.css">
 	<head>
 	<body>
-		<h1>First Try</h1>
+		<ul id="pages">
+			<li class="active"><a href="">Blog 1</a></li>
+			<li><a href="">Blog 2</a></li>
+		</ul>
+		<div id="edit">
+			<textarea></textarea>
+			<div id="edit-buttons">
+				<button id="do-delete">Seite löschen</button>
+				<button id="do-preview">Vorschau</button>
+			</div>
+		</div>
+		<div id="preview" class="hidden">
+			<div id="content"></div>
+			<button id="do-edit">Editieren</button>
+		</div>
+		<script src="static-blog.js"></script>
 	</body>
 </html>
