@@ -1,5 +1,7 @@
 'use strict';
 
+const { ipcRenderer } = require('electron');
+
 window.addEventListener('load', evt => {
 	const $ = path => {
 		return document.getElementById(path.substr(1));
@@ -61,6 +63,10 @@ window.addEventListener('load', evt => {
 		$elm.appendChild($a);
 	};
 
-	add_page(1, "Blog 1", "# Blog 1\n\nSome Entry");
-	add_page(2, "Blog 2", "# Blog 2\n\nAnother Entry");
+	ipcRenderer.send('load-pages');
+	ipcRenderer.on('pages-loaded', (evt, pages) => {
+		pages.forEach(p => {
+			add_page(p.id, 'Page ' + p.id, p.body);
+		});
+	});
 });
