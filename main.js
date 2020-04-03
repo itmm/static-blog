@@ -15,14 +15,13 @@ app.on('ready', () => {
 	ipcMain.on('load-pages', evt => {
 		console.log("load json");
 		const p = path.join(app.getPath('documents'), 'static-blog');
-		console.log('path', p);
 		const pages = JSON.parse(fs.readFileSync(path.join(p, "pages.json")));
-		console.log("pages", pages);
 		let result = [];
-		pages.forEach(id => {
+		pages.forEach(pg => {
 			result.push({
-				'id': id,
-				'body': fs.readFileSync(path.join(p, 'page-' + id + '.md'))
+				'file': pg.file,
+				'small': pg.small,
+				'body': fs.readFileSync(path.join(p, pg.file + '.html'))
 			});
 		});
 		evt.reply('pages-loaded', result);

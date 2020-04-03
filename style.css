@@ -16,6 +16,7 @@ body {
 }
 #pages {
 	list-style-type: none;
+	flex-shrink: 0;
 }
 #pages li {
 	padding: 4px 8px;
@@ -29,8 +30,11 @@ body {
 	flex-direction: column;
 	flex-grow: 1;
 }
-#edit textarea, #content {
-		flex-grow: 1;
+#edit-area, #content {
+	flex-grow: 1;
+}
+#edit-area {
+	padding: 10px;
 }
 #edit-buttons {
 	display: flex;

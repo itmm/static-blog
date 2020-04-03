@@ -4,6 +4,7 @@
 		<meta charset="utf-8">
 		<title>Static Blog</title>
 		<link rel="stylesheet" href="style.css">
+		<link rel="stylesheet" href="suneditor.min.css">
 	<head>
 	<body>
 		<ul id="pages">
@@ -13,14 +14,10 @@
 			<div id="edit-buttons">
 				<button id="do-delete">Seite löschen</button>
 				<button id="do-undo">Änderungen zurücknehmen</button>
-				<button id="do-preview">Vorschau</button>
 			</div>
 		</div>
-		<div id="preview" class="hidden">
-			<div id="content"></div>
-			<button id="do-edit">Editieren</button>
-		</div>
-		<script src="markdown-it.min.js"></script>
+		<script src="suneditor.min.js"></script>
+		<script src="suneditor.de.js"></script>
 		<script src="static-blog.js"></script>
 	</body>
 </html>
