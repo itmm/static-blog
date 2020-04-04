@@ -12,19 +12,23 @@ app.on('ready', () => {
 			nodeIntegration: true
 		}
 	});
+	const full_path = path.join(app.getPath('documents'), 'static-blog');
 	ipcMain.on('load-pages', evt => {
-		console.log("load json");
-		const p = path.join(app.getPath('documents'), 'static-blog');
-		const pages = JSON.parse(fs.readFileSync(path.join(p, "pages.json")));
+		const pages = JSON.parse(fs.readFileSync(path.join(full_path, "pages.json")));
 		let result = [];
 		pages.forEach(pg => {
 			result.push({
 				'file': pg.file,
-				'small': pg.small,
-				'body': fs.readFileSync(path.join(p, pg.file + '.html'))
+				'short': pg.short,
+				'active': pg.active,
+				'body': fs.readFileSync(path.join(full_path, pg.file + '.html'))
 			});
 		});
 		evt.reply('pages-loaded', result);
+	});
+	ipcMain.on('save-page', (evt, pg) => {
+		console.log('write ' + pg.file);
+		fs.writeFileSync(path.join(full_path, pg.file + '.html'), pg.body);
 	});
 	win.loadFile('index.html');
 });

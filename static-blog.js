@@ -14,23 +14,34 @@ window.addEventListener('load', evt => {
 
 	const $edit_area = $('#edit-area');
 	const editor = SUNEDITOR.create($edit_area, {
+	    buttonList: [
+			['undo', 'redo'],
+			['font', 'fontSize', 'formatBlock'],
+			['paragraphStyle', 'blockquote'],
+			['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+			['fontColor', 'hiliteColor', 'textStyle'],
+			['removeFormat'],
+			['outdent', 'indent'],
+			['align', 'horizontalRule', 'list'],
+			['table', 'link', 'image'],
+			['showBlocks', 'codeView'],
+			'preview'
+		],
+		width: '100%', height: 'auto',
 		lang: SUNEDITOR_LANG['de']
 	});
-	$edit_area.addEventListener('change', evt => {
+	editor.onBlur = function(evt, core) {
 		if (active_id) {
 			const val = editor.getContents();
-			if (val !== pages[active_id].body) {
-				pages[active_id].undos.push(pages[active_id].body);
-				pages[active_id].body = val;
+			const pg = pages[active_id];
+			if (val !== pg.body) {
+				if (! pg.undos) { pg.undos = []; }
+				pg.undos.push(pg.body);
+				pg.body = val;
+				ipcRenderer.send('save-page', pg);
 			}
 		}
-	});
-	$('#do-undo').addEventListener('click', evt => {
-		evt.preventDefault();
-		if (active_id && pages[active_id].undos.length) {
-			$edit_area.value = pages[active_id].undos.pop();
-		}
-	});
+	};
 	const add_page = p => {
 		const id = Object.keys(pages).length + 1;
 		p.id = id;
@@ -40,7 +51,7 @@ window.addEventListener('load', evt => {
 		$elm.id = 'page-' + id;
 		$pages.appendChild($elm);
 		const $a = document.createElement('a');
-		$a.innerText = p.small;
+		$a.innerText = p.short;
 		$a.addEventListener('click', evt => {
 			if (active_id) {
 				$('#page-' + active_id).classList.remove('active');
