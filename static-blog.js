@@ -24,8 +24,7 @@ window.addEventListener('load', evt => {
 			['outdent', 'indent'],
 			['align', 'horizontalRule', 'list'],
 			['table', 'link', 'image'],
-			['showBlocks', 'codeView'],
-			'preview'
+			['showBlocks', 'codeView']
 		],
 		width: '100%', height: 'auto',
 		lang: SUNEDITOR_LANG['de']
@@ -48,6 +47,7 @@ window.addEventListener('load', evt => {
 		pages[id] = p;
 		page_ids.push(id);
 		const $elm = document.createElement('li');
+		if (! p.active) { $elm.classList.add('inactive'); }
 		$elm.id = 'page-' + id;
 		$pages.appendChild($elm);
 		const $a = document.createElement('a');

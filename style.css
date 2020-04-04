@@ -22,6 +22,9 @@ body {
 #pages li {
 	padding: 4px 8px;
 }
+#pages li.inactive {
+	background-color: #ccc;
+}
 #pages li a, #pages li a:visited {
 	color: #000;
 	text-decoration: none;
@@ -51,4 +54,7 @@ textarea {
 }
 #content {
 	margin: 32px;
+}
+.sun-editor-editable {
+	word-break: normal !Important;
 }
