@@ -8,9 +8,8 @@ window.addEventListener('load', evt => {
 	};
 	const $content = $('#content');
 	const $pages = $('#pages');
-	let active_id = 0;
-	let pages = {};
-	let page_ids = [];
+	let active_idx = 0;
+	let pages = [];
 
 	const $edit_area = $('#edit-area');
 	const editor = SUNEDITOR.create($edit_area, {
@@ -42,31 +41,38 @@ window.addEventListener('load', evt => {
 		}
 	};
 	const add_page = p => {
-		const id = Object.keys(pages).length + 1;
-		p.id = id;
-		pages[id] = p;
-		page_ids.push(id);
+		pages.push(p);
+		const idx = pages.length;
 		const $elm = document.createElement('li');
 		if (! p.active) { $elm.classList.add('inactive'); }
-		$elm.id = 'page-' + id;
+		$elm.id = 'page-' + idx;
 		$pages.appendChild($elm);
 		const $a = document.createElement('a');
 		$a.innerText = p.short;
 		$a.addEventListener('click', evt => {
-			if (active_id) {
-				$('#page-' + active_id).classList.remove('active');
+			if (active_idx) {
+				$('#page-' + active_idx).classList.remove('active');
 			}
-			$('#page-' + id).classList.add('active');
-			active_id = id;
-			editor.setContents(pages[id].body);
+			$('#page-' + idx).classList.add('active');
+			active_idx = idx;
+			editor.setContents(pages[idx].body);
 		});
 		$elm.appendChild($a);
 	};
 
 	ipcRenderer.send('load-pages');
-	ipcRenderer.on('pages-loaded', (evt, pages) => {
-		pages.forEach(p => {
+	ipcRenderer.on('pages-loaded', (evt, pgs) => {
+		pages = [];
+		while ($pages.firstChild) {
+			$pages.removeChild($pages.firstChild);
+		}
+		pgs.forEach(p => {
 			add_page(p);
 		});
+	});
+
+	$('#build').addEventListener('click', evt => {
+		evt.preventDefault();
+		ipcRenderer.send('build-pages', pages);
 	});
 });
