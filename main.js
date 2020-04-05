@@ -3,6 +3,7 @@
 const { app, ipcMain, BrowserWindow } = require('electron');
 const fs = require('fs');
 const path = require('path');
+const ftp = require('ftp');
 
 app.on('ready', () => {
 	const win = new BrowserWindow({
@@ -13,6 +14,7 @@ app.on('ready', () => {
 		}
 	});
 	const full_path = path.join(app.getPath('documents'), 'static-blog');
+	const server = JSON.parse(fs.readFileSync(path.join(full_path, "server.json")).toString('utf8'));
 	ipcMain.on('load-pages', evt => {
 		const pages = JSON.parse(fs.readFileSync(path.join(full_path, "pages.json")).toString('utf8'));
 		let result = [];
@@ -64,7 +66,8 @@ app.on('ready', () => {
 			}
 		});
 	};
-	ipcMain.on('build-pages', (evt, pgs) => {
+	const build_pages = pgs => {
+		console.log('BUILD pages');
 		pgs.forEach(pg => {
 			build_page(pg, pgs);
 		});
@@ -76,7 +79,84 @@ app.on('ready', () => {
 			file: 'impressum', body: fs.readFileSync(path.join(full_path, 'impressum.html')).toString('utf8'),
 			index: false, full: 'Impressum'
 		}, pgs);
+	};
+	ipcMain.on('build-pages', (evt, pgs) => {
+		build_pages(pgs);
+	});
+	const copy_one = (lst, root, client, cont) => {
+		if (! lst.length) { cont(client); return; }
+		const name = lst.pop();
+		if (name === 'build' || name === 'server.json' || name[0] === '.') {
+			copy_one(lst, root, client, cont);
+			return;
+		}
+		console.log('PUT ', path.join(root, name));
+		client.put(
+			path.join(root, name),
+			name, false,
+			err => {
+				if (err) throw err;
+				copy_one(lst, root, client, cont);
+		});
 
+	};
+	const finished_upload = client => {
+		console.log('END');
+		client.end();
+	}
+	const copy_dynamics = client => {
+		console.log('CWD ..');
+		client.cwd('..', err => {
+			if (err) throw err;
+			let root = path.join(full_path, 'build');
+			let entries = fs.readdirSync(root);
+			copy_one(entries, root, client, finished_upload);
+		});
+	};
+	const copy_statics = client => {
+		let entries = fs.readdirSync(full_path);
+		copy_one(entries, full_path, client, copy_dynamics);
+	}
+	const do_upload = client => {
+		console.log('CWD static-blog');
+		client.cwd('static-blog', err => {
+			if (err) {
+				console.log('MKDIR static-blog');
+				client.mkdir('static-blog', err => {
+					if (err) throw err;
+					console.log('CWD static-blog');
+					client.cwd('static-blog', err => {
+						if (err) throw err;
+						copy_statics(client);
+					});
+				});
+			} else {
+				copy_statics(client);
+			}
+		});
+	};
+	ipcMain.on('upload-pages', (evt, pgs) => {
+		build_pages(pgs);
+		console.log('UPLOAD pages');
+		let client = new ftp();
+		client.on('ready', () => {
+			try {
+				if (server.dir) {
+					client.cwd(server.dir, err => {
+						if (err) throw err;
+						do_upload(client);
+					});
+				} else {
+					do_upload(client);
+				}
+			} catch (err) {
+				client.end();
+			}
+		});
+		client.on('error', err => {
+			console.log('ERROR', err);
+		});
+		client.connect(server);
 	});
 
 	win.loadFile('index.html');

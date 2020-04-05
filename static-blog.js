@@ -73,6 +73,6 @@ window.addEventListener('load', evt => {
 
 	$('#build').addEventListener('click', evt => {
 		evt.preventDefault();
-		ipcRenderer.send('build-pages', pages);
+		ipcRenderer.send('upload-pages', pages);
 	});
 });
