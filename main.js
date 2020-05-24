@@ -220,7 +220,7 @@ app.on('ready', () => {
 		client.connect(server);
 	});
 
-	ipcMain.on('update-page-meta', pg => {
+	ipcMain.on('update-page-meta', (evt, pg) => {
 		const pt = path.join(full_path, "pages.json");
 		const pages = JSON.parse(fs.readFileSync(pt).toString('utf8'));
 		const file = pg.old_file ? pg.old_file : pg.file;
@@ -237,6 +237,22 @@ app.on('ready', () => {
 		});
 		fs.writeFileSync(pt, JSON.stringify(pages));
 		console.log('wrote pages.json');
+	});
+
+	ipcMain.on('update-pages-meta', (evt, pgs) => {
+		let pages = [];
+		pgs.forEach(p => {
+			pages.push({
+				'file': p.file,
+				'full': p.full,
+				'short': p.short,
+				'active': p.active,
+				'index': p.index
+			});
+		});
+		const pt = path.join(full_path, "pages.json");
+		fs.writeFileSync(pt, JSON.stringify(pages));
+		console.log('wrote full pages.json');
 	});
 	win.loadFile('index.html');
 });

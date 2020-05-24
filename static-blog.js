@@ -22,6 +22,28 @@ window.addEventListener('load', evt => {
 		}
 	};
 
+	const $edit_container = $('#edit-container');
+	const rethink_pages = () => {
+		const pgs = pages;
+		pages = [];
+		while ($pages.firstChild) {
+			$pages.removeChild($pages.firstChild);
+		}
+		pgs.forEach(p => {
+			add_page(p);
+		})
+		if (! active_idx) {
+			$full_name.value = '';
+			$short_name.value = '';
+			$file_name.value = '';
+			$entry_active.checked = '';
+			$entry_index.checked = '';
+			while ($edit_container.firstChild) {
+				$edit_container.removeChild($edit_container.firstChild);
+			}
+		}
+	};
+
 	const $content = $('#content');
 	const $pages = $('#pages');
 	const $full_name = $('#full-name');
@@ -69,6 +91,7 @@ window.addEventListener('load', evt => {
 			console.log("change", value, pg.active);
 			if (value !== pg.active) {
 				pg.active = value;
+				rethink_pages();
 				update_page_meta();
 			}
 		}
@@ -91,12 +114,12 @@ window.addEventListener('load', evt => {
 		return true;
 	});
 
-	const $edit_container = $('#edit-container');
 	const add_page = p => {
 		pages.push(p);
 		const idx = pages.length;
 		const $elm = document.createElement('li');
 		if (! p.active) { $elm.classList.add('inactive'); }
+		if (idx == active_idx) { $elm.classList.add('item-active'); }
 		$elm.id = 'page-' + idx;
 		$pages.appendChild($elm);
 		const $a = document.createElement('a');
@@ -174,6 +197,15 @@ window.addEventListener('load', evt => {
 		ipcRenderer.send('download-pages');
 	});
 	$('#new').addEventListener('click', evt => {
-		add_page({ file: 'ohne-title', short: 'Ohne Titel', full: 'Ohne Titel', enabled: false, index: false });
+		add_page({ file: '', short: 'Leer', full: '', enabled: false, index: false });
+	});
+	$('#delete').addEventListener('click', evt => {
+		let index = -1;
+		if (active_idx) {
+			pages.splice(active_idx - 1, 1);
+			active_idx = 0;
+			rethink_pages();
+			ipcRenderer.send('update-pages-meta', pages);
+		}
 	});
 });

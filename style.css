@@ -9,8 +9,14 @@ html, body {
 .hidden {
 	display: none !Important;
 }
-.item-active {
+#pages li.item-active {
 	background-color: #aaf;
+}
+#pages li.inactive {
+	background-color: #ccc;
+}
+#pages li.item-active.inactive {
+	background-color: #bbe;
 }
 body {
 	display: flex;
@@ -25,9 +31,6 @@ body {
 }
 #pages li {
 	padding: 4px 8px;
-}
-#pages li.inactive {
-	background-color: #ccc;
 }
 #pages li a, #pages li a:visited {
 	color: #000;
