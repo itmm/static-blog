@@ -114,6 +114,31 @@ window.addEventListener('load', evt => {
 		return true;
 	});
 
+	const li_drag_start = evt => {
+		evt.dataTransfer.effectAllowed = 'move';
+		evt.dataTransfer.setData('src_id', evt.currentTarget.id);
+		evt.dataTransfer.setDragImage(evt.currentTarget, 0, 0);
+	};
+	const li_drag_end = evt => {
+		evt.dataTransfer.clearData('src_id');
+	};
+	const li_drag_over = evt => {
+		evt.preventDefault();
+	};
+	const li_drop = evt => {
+		const src_id = evt.dataTransfer.getData('src_id');
+		const src_obj = $(`#${src_id}`);
+		if (src_obj != evt.currentTarget) {
+			$pages.insertBefore(src_obj, evt.currentTarget);
+			let new_pages = [];
+			for (let $c = $pages.firstChild; $c; $c = $c.nextSibling) {
+				new_pages.push(pages[+$c.id.substr(5) - 1]);
+			}
+			pages = new_pages;
+			rethink_pages();
+			ipcRenderer.send('update-pages-meta', pages);
+		}
+	};
 	const add_page = p => {
 		pages.push(p);
 		const idx = pages.length;
@@ -121,6 +146,11 @@ window.addEventListener('load', evt => {
 		if (! p.active) { $elm.classList.add('inactive'); }
 		if (idx == active_idx) { $elm.classList.add('item-active'); }
 		$elm.id = 'page-' + idx;
+		$elm.setAttribute('draggable', true);
+		$elm.addEventListener('dragstart', li_drag_start);
+		$elm.addEventListener('dragend', li_drag_end);
+		$elm.addEventListener('dragover', li_drag_over);
+		$elm.addEventListener('drop', li_drop);
 		$pages.appendChild($elm);
 		const $a = document.createElement('a');
 		$a.innerText = p.short;
