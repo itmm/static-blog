@@ -235,7 +235,7 @@ app.on('ready', () => {
 				p.index = (p.file === pg.file);
 			}
 		});
-		fs.writeFileSync(pt, JSON.toString(pages));
+		fs.writeFileSync(pt, JSON.stringify(pages));
 		console.log('wrote pages.json');
 	});
 	win.loadFile('index.html');

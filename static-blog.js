@@ -34,6 +34,7 @@ window.addEventListener('load', evt => {
 				update_page_meta();
 			}
 		}
+		return true;
 	});
 	const $short_name = $('#short-name');
 	$short_name.addEventListener('change', () => {
@@ -45,6 +46,7 @@ window.addEventListener('load', evt => {
 				update_page_meta();
 			}
 		}
+		return true;
 	});
 	const $file_name = $('#file-name');
 	$file_name.addEventListener('change', () => {
@@ -57,24 +59,27 @@ window.addEventListener('load', evt => {
 				update_page_meta();
 			}
 		}
+		return true;
 	});
 	const $entry_active = $('#entry-active');
 	$entry_active.addEventListener('change', () => {
 		if (active_idx) {
 			const pg = get_active();
-			const value = $entry_active.hasAttribute('checked');
+			const value = $entry_active.checked;
+			console.log("change", value, pg.active);
 			if (value !== pg.active) {
 				pg.active = value;
 				update_page_meta();
 			}
 		}
+		return true;
 	});
 	const $entry_index = $('#entry-index');
 	$entry_index.addEventListener('change', () => {
 		if (active_idx) {
 			const pg = get_active();
 			if (! pg.index && pg.active) {
-				const value = $entry_index.hasAttribute('checked');
+				const value = $entry_index.checked;
 				if (value !== pg.index) {
 					pages.forEach(p => {
 						p.active = (p.idx === pg.idx);
@@ -83,6 +88,7 @@ window.addEventListener('load', evt => {
 				}
 			}
 		}
+		return true;
 	});
 
 	const $edit_container = $('#edit-container');
@@ -133,16 +139,8 @@ window.addEventListener('load', evt => {
 			$full_name.value = pages[idx - 1].full;
 			$short_name.value = pages[idx - 1].short;
 			$file_name.value = pages[idx - 1].file;
-			if (pages[idx - 1].active) {
-				$entry_active.setAttribute('checked', 'checked');
-			} else {
-				$entry_active.removeAttribute('checked');
-			}
-			if (pages[idx - 1].index) {
-				$entry_index.setAttribute('checked', 'checked');
-			} else {
-				$entry_index.removeAttribute('checked');
-			}
+			$entry_active.checked = pages[idx - 1].active;
+			$entry_index.checked = pages[idx - 1].index;
 			if (active_idx) {
 				$('#page-' + active_idx).classList.remove('item-active');
 			}
