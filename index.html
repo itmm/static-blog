@@ -7,8 +7,12 @@
 		<link rel="stylesheet" href="suneditor.min.css">
 	<head>
 	<body>
-		<ul id="pages">
-		</ul>
+		<div id="nav">
+			<ul id="pages"></ul>
+			<button id="new">Neue Seite</button>
+			<button id="build">Seiten hochladen</button>
+			<button id="download">Seiten vom Server laden</button>
+		</div>
 		<div id="edit">
 			<div class="meta">
 				<label for="full-name">Vollständiger Name:</label><input id="full-name">
@@ -17,8 +21,6 @@
 				<label for="entry-active">Aktiv:</label><input id="entry-active" type="checkbox">
 				<label for="entry-index">Startseite:</label><input id="entry-index" type="checkbox">
 			</div>
-			<button id="build">Seiten hochladen</button>
-			<button id="download">Seiten vom Server laden</button>
 			<div id="edit-container">
 			</div>
 		</div>

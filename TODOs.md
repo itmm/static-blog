@@ -1,5 +1,4 @@
 * reorder pages
-* add pages
 * undo/redo support
 * update highlight on active change
 * activate dynamic background

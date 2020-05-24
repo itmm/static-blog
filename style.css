@@ -15,9 +15,13 @@ html, body {
 body {
 	display: flex;
 }
+#nav {
+	display: flex;
+	flex-shrink: 0;
+	flex-direction: column;
+}
 #pages {
 	list-style-type: none;
-	flex-shrink: 0;
 }
 #pages li {
 	padding: 4px 8px;

@@ -173,4 +173,7 @@ window.addEventListener('load', evt => {
 		evt.preventDefault();
 		ipcRenderer.send('download-pages');
 	});
+	$('#new').addEventListener('click', evt => {
+		add_page({ file: 'ohne-title', short: 'Ohne Titel', full: 'Ohne Titel', enabled: false, index: false });
+	});
 });
