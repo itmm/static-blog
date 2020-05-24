@@ -15,14 +15,15 @@ app.on('ready', () => {
 	});
 	const full_path = path.join(app.getPath('documents'), 'static-blog');
 	const server = JSON.parse(fs.readFileSync(path.join(full_path, "server.json")).toString('utf8'));
-	ipcMain.on('load-pages', evt => {
+	const load_pages = evt => {
 		const pages = JSON.parse(fs.readFileSync(path.join(full_path, "pages.json")).toString('utf8'));
-		let result = [];
 		pages.forEach(pg => {
 			pg.body = fs.readFileSync(path.join(full_path, pg.file + '.html')).toString('utf8');
-			result.push(pg);
 		});
-		evt.reply('pages-loaded', result);
+		evt.reply('pages-loaded', pages);
+	};
+	ipcMain.on('load-pages', evt => {
+		load_pages(evt);
 	});
 	ipcMain.on('save-page', (evt, pg) => {
 		console.log('write ' + pg.file);
@@ -44,8 +45,10 @@ app.on('ready', () => {
 		const yr = (new Date()).getFullYear();
 		let nav = '';
 		pgs.forEach(p2 => {
-			nav += "<li" + (pg.file === p2.file ? " class=\"active\"" : '')  + "><a href=\"" + p2.file + ".html\"" +
-				">" + htmlify(p2.short) + "</a></li>\n";
+			if (p2.active) {
+				nav += "<li" + (pg.file === p2.file ? " class=\"active\"" : '')  + "><a href=\"" + p2.file + ".html\"" +
+					">" + htmlify(p2.short) + "</a></li>\n";
+			}
 		});
 		let val = template.replace(/\$\{NAVIGATION\}/g, nav);
 		val = val.replace(/\$\{CONTENT\}/g, pg.body);
@@ -69,7 +72,9 @@ app.on('ready', () => {
 	const build_pages = pgs => {
 		console.log('BUILD pages');
 		pgs.forEach(pg => {
-			build_page(pg, pgs);
+			if (pg.active) {
+				build_page(pg, pgs);
+			}
 		});
 		build_page({
 			file: 'datenschutz', body: fs.readFileSync(path.join(full_path, 'datenschutz.html')).toString('utf8'),
@@ -83,11 +88,11 @@ app.on('ready', () => {
 	ipcMain.on('build-pages', (evt, pgs) => {
 		build_pages(pgs);
 	});
-	const copy_one = (lst, root, client, cont) => {
+	const put_one = (lst, root, client, cont) => {
 		if (! lst.length) { cont(client); return; }
 		const name = lst.pop();
 		if (name === 'build' || name === 'server.json' || name[0] === '.') {
-			copy_one(lst, root, client, cont);
+			put_one(lst, root, client, cont);
 			return;
 		}
 		console.log('PUT ', path.join(root, name));
@@ -96,7 +101,7 @@ app.on('ready', () => {
 			name, false,
 			err => {
 				if (err) throw err;
-				copy_one(lst, root, client, cont);
+				put_one(lst, root, client, cont);
 		});
 
 	};
@@ -110,12 +115,12 @@ app.on('ready', () => {
 			if (err) throw err;
 			let root = path.join(full_path, 'build');
 			let entries = fs.readdirSync(root);
-			copy_one(entries, root, client, finished_upload);
+			put_one(entries, root, client, finished_upload);
 		});
 	};
 	const copy_statics = client => {
 		let entries = fs.readdirSync(full_path);
-		copy_one(entries, full_path, client, copy_dynamics);
+		put_one(entries, full_path, client, copy_dynamics);
 	}
 	const do_upload = client => {
 		console.log('CWD static-blog');
@@ -142,6 +147,7 @@ app.on('ready', () => {
 		client.on('ready', () => {
 			try {
 				if (server.dir) {
+					console.log(`CWD ${server.dir}`);
 					client.cwd(server.dir, err => {
 						if (err) throw err;
 						do_upload(client);
@@ -150,15 +156,88 @@ app.on('ready', () => {
 					do_upload(client);
 				}
 			} catch (err) {
+				evt.reply('error', err);
 				client.end();
 			}
 		});
 		client.on('error', err => {
-			console.log('ERROR', err);
+			evt.reply('error', err);
 		});
 		client.connect(server);
 	});
 
+	const get_one = (evt, lst, root, client, cont) => {
+		if (! lst.length) { cont(evt, client); return; }
+		const name = lst.pop().name;
+		if (name === 'server.json' || name[0] === '.') {
+			get_one(evt, lst, root, client, cont);
+			return;
+		}
+		console.log('GET ', path.join(root, name));
+		client.get(
+			name,
+			(err, stream) => {
+				if (err) throw err;
+				stream.once('close', () => {
+					get_one(evt, lst, root, client, cont);
+				});
+				stream.pipe(fs.createWriteStream(path.join(root, name)));
+		});
+
+	};
+	const finished_download = (evt, client) => {
+		console.log('END');
+		client.end();
+		load_pages(evt);
+	}
+	const do_download = (evt, client) => {
+		console.log('LS .');
+		client.list('.', (err, files) => {
+			if (err) { throw err; }
+			get_one(evt, files, full_path, client, finished_download);
+		});
+	};
+	ipcMain.on('download-pages', evt => {
+		console.log('DOWNLOAD pages');
+		let client = new ftp();
+		client.on('ready', () => {
+			try {
+				let dir = server.dir ? server.dir + '/' : '';
+				dir += 'static-blog';
+				console.log(`CWD ${dir}`);
+				client.cwd(dir, err => {
+					if (err) throw err;
+					do_download(evt, client);
+				});
+			} catch (err) {
+				evt.reply('error', err);
+				client.end();
+			}
+		});
+		client.on('error', err => {
+			evt.reply('error', err);
+		});
+		client.connect(server);
+	});
+
+	ipcMain.on('update-page-meta', pg => {
+		const pt = path.join(full_path, "pages.json");
+		const pages = JSON.parse(fs.readFileSync(pt).toString('utf8'));
+		const file = pg.old_file ? pg.old_file : pg.file;
+		pages.forEach(p => {
+			if (p.file === file) {
+				p.full = pg.full;
+				p.short = pg.short;
+				p.file = pg.file;
+				p.active = pg.active;
+			}
+			if (pg.index) {
+				p.index = (p.file === pg.file);
+			}
+		});
+		fs.writeFileSync(pt, JSON.toString(pages));
+		console.log('wrote pages.json');
+	});
 	win.loadFile('index.html');
 });
 

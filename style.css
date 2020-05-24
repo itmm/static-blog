@@ -9,7 +9,7 @@ html, body {
 .hidden {
 	display: none !Important;
 }
-.active {
+.item-active {
 	background-color: #aaf;
 }
 body {
@@ -29,16 +29,15 @@ body {
 	color: #000;
 	text-decoration: none;
 }
-#edit, #preview {
+#edit {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
 }
-#edit-area, #content {
+#edit-container {
+	width: calc(100% - 16px);
+	margin: 4px 8px;
 	flex-grow: 1;
-}
-#edit-area {
-	padding: 10px;
 }
 #edit-buttons {
 	display: flex;
@@ -57,4 +56,12 @@ textarea {
 }
 .sun-editor-editable {
 	word-break: normal !Important;
+}
+.meta {
+	margin: 4px 8px;
+	display: grid;
+	grid-template-columns: auto auto auto;
+}
+.meta input {
+	grid-column: 2 / 4;
 }

@@ -10,8 +10,17 @@
 		<ul id="pages">
 		</ul>
 		<div id="edit">
+			<div class="meta">
+				<label for="full-name">Vollständiger Name:</label><input id="full-name">
+				<label for="short-name">Name in Navigation:</label><input id="short-name">
+				<label for="file-name">Dateiname:</label><input id="file-name">
+				<label for="entry-active">Aktiv:</label><input id="entry-active" type="checkbox">
+				<label for="entry-index">Startseite:</label><input id="entry-index" type="checkbox">
+			</div>
 			<button id="build">Seiten hochladen</button>
-			<textarea id="edit-area"></textarea>
+			<button id="download">Seiten vom Server laden</button>
+			<div id="edit-container">
+			</div>
 		</div>
 		<script src="suneditor.min.js"></script>
 		<script src="suneditor.de.js"></script>
