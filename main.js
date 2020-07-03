@@ -95,7 +95,7 @@ app.on('ready', () => {
 			put_one(lst, root, client, cont);
 			return;
 		}
-		console.log('PUT ', path.join(root, name));
+		win.webContents.send('log', `sende Datei ${name}`);
 		client.put(
 			path.join(root, name),
 			name, false,
@@ -106,11 +106,11 @@ app.on('ready', () => {
 
 	};
 	const finished_upload = client => {
-		console.log('END');
+		win.webContents.send('log', '');
 		client.end();
 	}
 	const copy_dynamics = client => {
-		console.log('CWD ..');
+		win.webContents.send('log', 'wechsle Verzeichnis zurück');
 		client.cwd('..', err => {
 			if (err) throw err;
 			let root = path.join(full_path, 'build');
@@ -123,13 +123,13 @@ app.on('ready', () => {
 		put_one(entries, full_path, client, copy_dynamics);
 	}
 	const do_upload = client => {
-		console.log('CWD static-blog');
+		win.webContents.send('log', 'wechsle in Repo-Verzeichnis');
 		client.cwd('static-blog', err => {
 			if (err) {
-				console.log('MKDIR static-blog');
+				win.webContents.send('log', 'erzeuge Repo-Verzeichnis');
 				client.mkdir('static-blog', err => {
 					if (err) throw err;
-					console.log('CWD static-blog');
+					win.webContents.send('log', 'wechsle in Repo-Verzeichnis');
 					client.cwd('static-blog', err => {
 						if (err) throw err;
 						copy_statics(client);
@@ -142,12 +142,12 @@ app.on('ready', () => {
 	};
 	ipcMain.on('upload-pages', (evt, pgs) => {
 		build_pages(pgs);
-		console.log('UPLOAD pages');
+		win.webContents.send('log', '');
 		let client = new ftp();
 		client.on('ready', () => {
 			try {
 				if (server.dir) {
-					console.log(`CWD ${server.dir}`);
+					win.webContents.send('log', `wechsle in Verzeichnis ${server.dir}`);
 					client.cwd(server.dir, err => {
 						if (err) throw err;
 						do_upload(client);
@@ -173,7 +173,7 @@ app.on('ready', () => {
 			get_one(evt, lst, root, client, cont);
 			return;
 		}
-		console.log('GET ', path.join(root, name));
+		win.webContents.send('log', `hole Datei ${name}`);
 		client.get(
 			name,
 			(err, stream) => {
@@ -186,25 +186,25 @@ app.on('ready', () => {
 
 	};
 	const finished_download = (evt, client) => {
-		console.log('END');
+		win.webContents.send('log', '');
 		client.end();
 		load_pages(evt);
 	}
 	const do_download = (evt, client) => {
-		console.log('LS .');
+		win.webContents.send('log', 'hole Liste der Dateien');
 		client.list('.', (err, files) => {
 			if (err) { throw err; }
 			get_one(evt, files, full_path, client, finished_download);
 		});
 	};
 	ipcMain.on('download-pages', evt => {
-		console.log('DOWNLOAD pages');
+		win.webContents.send('log', 'lade Seiten vom Server');
 		let client = new ftp();
 		client.on('ready', () => {
 			try {
 				let dir = server.dir ? server.dir + '/' : '';
 				dir += 'static-blog';
-				console.log(`CWD ${dir}`);
+				win.webContents.send('log', `wechsle Verzeichnis nach ${dir}`);
 				client.cwd(dir, err => {
 					if (err) throw err;
 					do_download(evt, client);

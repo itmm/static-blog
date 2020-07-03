@@ -238,4 +238,18 @@ window.addEventListener('load', evt => {
 			ipcRenderer.send('update-pages-meta', pages);
 		}
 	});
+	const $working = $('#working');
+	const $working_msg = $working.getElementsByTagName('span')[0];
+	$working.addEventListener('click', evt => {
+		evt.preventDefault();
+		$working.classList.add('hidden');
+	});
+	ipcRenderer.on('log', (evt, msg) => {
+		if (msg != '') {
+			$working_msg.innerText = msg;
+			$working.classList.remove('hidden');
+		} else {
+			$working.classList.add('hidden');
+		}
+	});
 });
