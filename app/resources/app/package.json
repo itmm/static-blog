@@ -4,15 +4,11 @@
   "description": "Generator of static blog-like Homepages",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Timm Knape",
   "license": "MIT",
-  "devDependencies": {
-    "electron": "^6.1.3",
-    "electron-builder": "^21.2.0"
-  },
+  "devDependencies": {},
   "dependencies": {
     "ftp": "^0.3.10",
     "markdown-it": "^10.0.0",
