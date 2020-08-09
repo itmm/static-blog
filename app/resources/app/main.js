@@ -224,6 +224,29 @@ app.on('ready', () => {
 		const pt = path.join(full_path, "pages.json");
 		const pages = JSON.parse(fs.readFileSync(pt).toString('utf8'));
 		const file = pg.old_file ? pg.old_file : pg.file;
+		if (file === '') {
+			evt.reply('error', 'Name ist leer');
+			return;
+		}
+		if (pg.old_file) {
+			let found = false;
+			pages.forEach(p => {
+				if (p.file === pg.file) {
+					found = true;
+				}
+			});
+			if (found) {
+				evt.reply('error', 'Name wird bereits verwendet');
+				return;
+			}
+			const from_path = path.join(full_path, pg.old_file + '.html');
+			const to_path = path.join(full_path, pg.file + '.html');
+			fs.rename(from_path, to_path, err => {
+				if (err) {
+					console.log(`file ${from_path} was not renamed to ${to_path}`);
+				}
+			});
+		}
 		pages.forEach(p => {
 			if (p.file === file) {
 				p.full = pg.full;

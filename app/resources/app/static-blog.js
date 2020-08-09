@@ -71,10 +71,31 @@ window.addEventListener('load', evt => {
 		return true;
 	});
 	const $file_name = $('#file-name');
+	const normalize_filename = name => {
+		let result = "";
+		for (let i = 0; i < name.length; ++i) {
+			let c = name.charAt(i);
+			if (c >= '0' && c <= '9') {
+				//
+			} else if (c >= 'a' && c <= 'z') {
+				//
+			} else if (c >= 'A' && c <= 'Z') {
+				//
+			} else if (c === '-' || c === '_' || c === '+' || c === '.' || c === ',') {
+				//
+			} else {
+				continue;
+			}
+			result += c;
+		}
+		return result;
+	};
+
 	$file_name.addEventListener('change', () => {
 		if (active_idx) {
 			const pg = get_active();
-			const value = $file_name.value;
+			const value = normalize_filename($file_name.value);
+			$file_name.value = value;
 			if (value !== pg.file) {
 				pg.old_file = pg.file;
 				pg.file = value;
