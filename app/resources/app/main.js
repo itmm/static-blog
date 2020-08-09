@@ -18,7 +18,11 @@ app.on('ready', () => {
 	const load_pages = evt => {
 		const pages = JSON.parse(fs.readFileSync(path.join(full_path, "pages.json")).toString('utf8'));
 		pages.forEach(pg => {
-			pg.body = fs.readFileSync(path.join(full_path, pg.file + '.html')).toString('utf8');
+			try {
+				pg.body = fs.readFileSync(path.join(full_path, pg.file + '.html')).toString('utf8');
+			} catch (err) {
+				console.log(`can't load ${pg.file}.html`);
+			}
 		});
 		evt.reply('pages-loaded', pages);
 	};

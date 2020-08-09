@@ -233,6 +233,9 @@ window.addEventListener('load', evt => {
 		}
 		pgs.forEach(p => {
 			add_page(p);
+			if (! p.body) {
+				alert(`Seite ${p.full} konnte nicht geladen werden`);
+			}
 		});
 	});
 	ipcRenderer.on('error', (evt, err) => {
