@@ -126,10 +126,13 @@ window.addEventListener('load', evt => {
 				const value = $entry_index.checked;
 				if (value !== pg.index) {
 					pages.forEach(p => {
-						p.active = (p.idx === pg.idx);
+						p.index = false;
 					});
+					pg.index = true;
 					update_page_meta();
 				}
+			} else if (pg.active) {
+				$entry_index.checked = true;
 			}
 		}
 		return true;
@@ -214,7 +217,7 @@ window.addEventListener('load', evt => {
 			$short_name.value = pages[idx - 1].short;
 			$file_name.value = pages[idx - 1].file;
 			$entry_active.checked = pages[idx - 1].active;
-			$entry_index.checked = pages[idx - 1].index;
+			$entry_index.checked = !! pages[idx - 1].index;
 			if (active_idx) {
 				$('#page-' + active_idx).classList.remove('item-active');
 			}
