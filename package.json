@@ -10,7 +10,7 @@
   "author": "Timm Knape",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^39.8.4"
+    "electron": "^39.8.10"
   },
   "dependencies": {
     "ftp": "^0.3.10",
